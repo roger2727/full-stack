@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
   console.log("Request headers: ", req.headers);
@@ -7,7 +8,7 @@ const authenticateJWT = (req, res, next) => {
     const token = authHeader.split(" ")[1];
     console.log("Token: ", token);
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
       if (err) {
         console.log("Error verifying token: ", err);
         return res.sendStatus(403);
@@ -22,4 +23,5 @@ const authenticateJWT = (req, res, next) => {
     res.sendStatus(401);
   }
 };
+
 export default authenticateJWT;

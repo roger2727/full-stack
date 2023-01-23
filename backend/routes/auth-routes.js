@@ -3,12 +3,14 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../models/user.js";
 import dotenv from "dotenv";
+
 dotenv.config();
+
 const router = express.Router();
 
 // Create a new user
 router.post("/register", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
 
   // Check if the required fields are present in the request body
   const { email, password, username } = req.body;
@@ -38,7 +40,7 @@ router.post("/register", async (req, res) => {
 
     // Insert the new user into the database
     const insertedUser = await UserModel.create(newUser);
-    console.log(insertedUser);
+    // console.log(insertedUser);
 
     // Send the new user as the response
     res.status(201).json({ user: insertedUser });
@@ -70,8 +72,8 @@ router.post("/login", async (req, res) => {
 
     // Create a JWT token with the user's _id included
     const payload = { userId: user._id };
-    console.log(payload);
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    // console.log(payload);
+    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
       expiresIn: "1h",
     });
 
@@ -83,7 +85,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   try {
     // Find all users in the database
     const users = await UserModel.find();

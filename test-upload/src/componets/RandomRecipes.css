@@ -1,0 +1,11 @@
+.random-recipes {
+  display: flex;
+  flex-wrap: wrap;
+}
+.recipe-image {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 20px;
+}

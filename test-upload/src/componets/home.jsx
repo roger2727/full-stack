@@ -1,13 +1,27 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import "./Home.css";
+import RandomRecipes from "./RandomRecipes";
 
 const Home = () => {
   const navigate = useNavigate();
   return (
-    <div>
-      <h1>Welcome to the Recipe App</h1>
-      <button onClick={() => navigate("/register")}>Register</button>
-      <button onClick={() => navigate("/login")}>Login</button>
+    <div className="home">
+      <div className="nav">
+        <h1>LOGO</h1>
+        <div>
+          <button className="auth-btn" onClick={() => navigate("/register")}>
+            Register
+          </button>
+          <button className="auth-btn" onClick={() => navigate("/login")}>
+            Login
+          </button>
+        </div>
+      </div>
+      <div>
+        <RandomRecipes />
+      </div>
+      <div></div>
     </div>
   );
 };

@@ -1,25 +1,27 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import mongooseConnection from "../db.js";
 
 const recipeSchema = new mongoose.Schema({
-  image: {
-    type: String,
-    required: false,
-  },
   title: {
     type: String,
     required: true,
   },
-  ingredients: {
-    type: [String],
-    required: true,
-  },
-  instructions: {
-    type: Array,
-    required: true,
-  },
-  image: {
+  ingredients: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
+  instructions: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
+  category: {
     type: String,
+    required: true,
+    enum: ["Dinner", "Breakfast", "Lunch", "Dessert"],
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -44,11 +46,26 @@ const recipeSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
   },
+  isPublic: {
+    type: Boolean,
+    default: false,
+  },
+  image: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
   },
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment",
+      // default: []
+    },
+  ],
 });
+
 const RecipeModel = mongooseConnection.model("Recipe", recipeSchema);
 
 export { RecipeModel };

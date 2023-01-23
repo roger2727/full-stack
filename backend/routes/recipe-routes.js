@@ -1,24 +1,25 @@
+import multer from "multer";
 import express from "express";
 import { RecipeModel } from "../models/recipe.js";
-import authenticateJWT from "../middleware/jwt-auth.js";
 import { UserModel } from "../models/user.js";
-import bodyParser from "body-parser";
-// import mongoose from "mongoose";
-// import mongoose from "mongoose";
-import multer from "multer";
-
-import { v2 as cloudinary } from "cloudinary";
+import authenticateJWT from "../middleware/jwt-auth.js";
 import dotenv from "dotenv";
-dotenv.config();
+
+import mongoose from "mongoose";
+import { v2 as cloudinary } from "cloudinary";
+// import multer from "multer";
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
 });
-// Configuration
+
+dotenv.config();
+
+// console.log(process.env.JWT_SECRET);
 
 const router = express.Router();
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/");
@@ -30,18 +31,19 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.use(bodyParser.json());
-
 router.post("/", authenticateJWT, async (req, res) => {
   try {
     const {
       title,
+      isPublic,
       ingredients,
       instructions,
+      category,
       cookingTime,
       servingSize,
       rating,
       vegetarian,
+      comments,
     } = req.body;
     const { userId } = req.user;
     console.log("route handler called");
@@ -53,13 +55,16 @@ router.post("/", authenticateJWT, async (req, res) => {
     console.log("creating recipe object");
     const recipe = new RecipeModel({
       title,
+      isPublic,
       ingredients,
       instructions,
       user: userId,
+      category,
       cookingTime,
       servingSize,
       rating,
       vegetarian,
+      comments,
     });
     await recipe.save();
     console.log("recipe saved");
@@ -94,6 +99,8 @@ router.post("/upload-image/:recipeId", authenticateJWT, async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
+
+// GETS ALL USERS RECIPES
 router.get("/all", authenticateJWT, async (req, res) => {
   try {
     //Find all recipes created by the current user
@@ -106,8 +113,21 @@ router.get("/all", authenticateJWT, async (req, res) => {
   }
 });
 
+// GETS ALL RECIPES
+router.get("/public", async (req, res) => {
+  try {
+    //Find all recipes created by the current user
+    const recipes = await RecipeModel.find({ isPublic: true });
+    // Send the recipes as the response
+    res.json({ recipes });
+  } catch (err) {
+    console.log("error", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 //SEARCH USERS RECIPES FOR SPECIFIC INGREDIENTS
-router.get("/search-ingredents", authenticateJWT, async (req, res) => {
+router.get("/search-ingredients", authenticateJWT, async (req, res) => {
   try {
     // Get the ingredients from the query parameters
     const ingredients = JSON.parse(req.query.ingredients);
@@ -150,6 +170,8 @@ router.delete("/delete/:recipeId", authenticateJWT, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// Update user Recipe
 router.patch("/update/:recipeId", authenticateJWT, async (req, res) => {
   try {
     // Find the recipe by its ID and the current user's ID
@@ -167,11 +189,12 @@ router.patch("/update/:recipeId", authenticateJWT, async (req, res) => {
     recipe.title = req.body.title;
     recipe.ingredients = req.body.ingredients;
     recipe.instructions = req.body.instructions;
-    recipe.image = req.body.image;
+    recipe.category = req.body.category;
     recipe.cookingTime = req.body.cookingTime;
     recipe.servingSize = req.body.servingSize;
     recipe.rating = req.body.rating;
     recipe.vegetarian = req.body.vegetarian;
+    recipe.comments = req.body.comments;
 
     // Save the updated recipe
     await recipe.save();
@@ -180,6 +203,26 @@ router.patch("/update/:recipeId", authenticateJWT, async (req, res) => {
     res.json({ recipe });
   } catch (err) {
     console.log("error", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/home", async (req, res) => {
+  try {
+    const randomRecipes = await RecipeModel.aggregate([
+      { $match: { isPublic: true } },
+      { $sample: { size: 4 } },
+    ]);
+    const newRecipes = randomRecipes.map((recipe) => {
+      recipe.image = cloudinary.url(recipe.image, {
+        width: 300,
+        height: 300,
+        crop: "fill",
+      });
+      return recipe;
+    });
+    res.json(newRecipes);
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
