@@ -1,48 +1,61 @@
-// import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import "./Carousel.css";
+import { Link } from "react-router-dom";
 
-// class Carousel extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       currentIndex: 0,
-//     };
-//     this.previous = this.previous.bind(this);
-//     this.next = this.next.bind(this);
-//   }
+const RecipeCarousel = () => {
+  const [recipes, setRecipes] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-//   previous() {
-//     const lastIndex = this.props.recipes.length - 1;
-//     const { currentIndex } = this.state;
-//     const shouldResetIndex = currentIndex === 0;
-//     const index = shouldResetIndex ? lastIndex : currentIndex - 1;
-//     this.setState({
-//       currentIndex: index,
-//     });
-//   }
+  useEffect(() => {
+    fetch("http://localhost:4001/recipes/get-all")
+      .then((res) => res.json())
+      .then((data) => setRecipes(data.recipes))
+      .catch((err) => console.log(err));
+  }, []);
 
-//   next() {
-//     const lastIndex = this.props.recipes.length - 1;
-//     const { currentIndex } = this.state;
-//     const shouldResetIndex = currentIndex === lastIndex;
-//     const index = shouldResetIndex ? 0 : currentIndex + 1;
-//     this.setState({
-//       currentIndex: index,
-//     });
-//   }
+  const handlePrevClick = () => {
+    if (currentIndex - 4 >= 0) {
+      setCurrentIndex(currentIndex - 4);
+    } else {
+      setCurrentIndex(recipes.length - 4);
+    }
+  };
 
-//   render() {
-//     const { currentIndex } = this.state;
-//     const currentRecipe = this.props.recipes[currentIndex];
+  const handleNextClick = () => {
+    if (currentIndex + 4 < recipes.length) {
+      setCurrentIndex(currentIndex + 4);
+    } else {
+      setCurrentIndex(0);
+    }
+  };
 
-//     return (
-//       <div>
-//         <button onClick={this.previous}>Previous</button>
-//         <img src={currentRecipe.image} alt={currentRecipe.title} />
-//         <p>{currentRecipe.title}</p>
-//         <button onClick={this.next}>Next</button>
-//       </div>
-//     );
-//   }
-// }
+  return (
+    <div>
+      <h2>public recipes</h2>
+      <div className="carousel-container ">
+        <div className="carousel">
+          <button className="carousel-btn" onClick={handlePrevClick}>
+            Prev
+          </button>
+          {recipes
+            .slice(currentIndex, currentIndex + 4)
+            .map((recipe, index) => (
+              <Link key={recipe._id} to={`/public/recipes/${recipe._id}`}>
+                <img
+                  className="carousel-image"
+                  src={recipe.image}
+                  alt={recipe.title}
+                  style={{ flex: "1 0 25%" }}
+                />
+              </Link>
+            ))}
+          <button className="carousel-btn" onClick={handleNextClick}>
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-// export default Carousel;
+export default RecipeCarousel;

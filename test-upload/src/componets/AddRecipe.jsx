@@ -6,10 +6,15 @@ const AddRecipe = () => {
     title: "",
     ingredients: "",
     instructions: "",
+    category: "",
+
     cookingTime: "",
     servingSize: "",
     rating: "",
     vegetarian: "",
+    isPublic: false,
+
+    comments: [],
   });
   const [recipeId, setRecipeId] = useState("");
   const navigate = useNavigate();
@@ -21,13 +26,16 @@ const AddRecipe = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:4001/recipe/", {
+      const response = await fetch("http://localhost:4001/recipes/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          createdAt: new Date(),
+        }),
       });
       if (response.ok) {
         const json = await response.json();
@@ -41,7 +49,6 @@ const AddRecipe = () => {
       console.error(err);
     }
   };
-
   return (
     <div>
       <h1>Add Recipe</h1>
@@ -55,6 +62,20 @@ const AddRecipe = () => {
             onChange={onChange}
             required
           />
+        </div>
+        <div>
+          <label htmlFor="category">Category</label>
+          <select
+            name="category"
+            value={formData.category}
+            onChange={onChange}
+            required
+          >
+            <option value="Dinner">Dinner</option>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Dessert">Dessert</option>
+          </select>
         </div>
         <div>
           <label htmlFor="ingredients">Ingredients</label>
@@ -74,6 +95,15 @@ const AddRecipe = () => {
             value={formData.instructions}
             onChange={onChange}
             required
+          />
+        </div>
+        <div>
+          <label htmlFor="isPublic">Public</label>
+          <input
+            type="checkbox"
+            name="isPublic"
+            value={formData.isPublic}
+            onChange={onChange}
           />
         </div>
         <div>

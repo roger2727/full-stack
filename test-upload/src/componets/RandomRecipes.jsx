@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./RandomRecipes.css";
 
 const RandomRecipes = () => {
@@ -20,11 +21,13 @@ const RandomRecipes = () => {
         {recipes.map((recipe) => (
           <div key={recipe._id}>
             {recipe.image && (
-              <img
-                className="recipe-image"
-                src={recipe.image}
-                alt={recipe.title}
-              />
+              <Link to={`/public/recipes/${recipe._id}`}>
+                <img
+                  className="recipe-image"
+                  src={recipe.image}
+                  alt={recipe.title}
+                />
+              </Link>
             )}
           </div>
         ))}

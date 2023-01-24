@@ -1,0 +1,24 @@
+.carousel-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.carousel {
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+  align-items: center;
+}
+
+.carousel-image {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 20px;
+}
+.carousel-btn {
+  height: 50%;
+}
