@@ -1,5 +1,3 @@
-// This test is checking that when a user sends a POST request to the "/auth/login" route with a valid email and password in the request body, the server should return a JSON response with a token and a message indicating a successful login. The test creates a new user with a hashed password in the test database before each test, and then sends a request with the email and plaintext password to the route. The test then asserts that the response has a "token" property and a "msg" property with the value "You have successfully logged in". The test also closes the server connection after all tests are run.
-
 import request from "supertest";
 import app from "../../app"; // import your express app
 import { UserModel } from "../../models/user";
@@ -12,9 +10,9 @@ describe("POST /auth/login", () => {
     // Create a new user in the test database
     const password = await bcrypt.hash("password", 12);
     user = new UserModel({
-      email: "test@example.com",
+      email: "testing@example.com",
       password,
-      username: "testuser",
+      username: "testinguser",
     });
     await user.save();
   });
@@ -28,7 +26,7 @@ describe("POST /auth/login", () => {
     // Send the email and password in the request body
     const res = await request(app)
       .post("/auth/login")
-      .send({ email: "test@example.com", password: "password" })
+      .send({ email: "testing@example.com", password: "password" })
       .expect(200);
 
     expect(res.body).toHaveProperty("token");

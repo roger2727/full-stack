@@ -39,29 +39,28 @@ const recipeSchema = new mongoose.Schema({
   rating: {
     type: Number,
     min: 0,
-    max: 10,
+    max: 5,
     required: true,
   },
-  vegetarian: {
-    type: Boolean,
-    required: true,
-  },
-  isPublic: {
-    type: Boolean,
-    default: false,
-  },
+  // vegetarian: {
+  //   type: Boolean,
+  //   required: false,
+  // },
+  // isPublic: {
+  //   type: Boolean,
+  //   default: false,
+  // },
   image: {
     type: String,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  // createdAt: {
+  //   type: Date,
+  //   default: Date.now,
+  // },
   comments: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Comment",
-      // default: []
     },
   ],
 });

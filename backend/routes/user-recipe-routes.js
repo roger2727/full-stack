@@ -17,9 +17,8 @@ cloudinary.config({
 
 dotenv.config();
 
-// console.log(process.env.JWT_SECRET);
-
 const router = express.Router();
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/");
@@ -31,93 +30,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.post("/", authenticateJWT, async (req, res) => {
-  try {
-    const {
-      title,
-      isPublic,
-      ingredients,
-      instructions,
-      category,
-      cookingTime,
-      servingSize,
-      rating,
-      vegetarian,
-      comments,
-    } = req.body;
-    const { userId } = req.user;
-    console.log("route handler called");
-    console.log("finding user");
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      return res.status(404).send({ error: "User not found" });
-    }
-    console.log("creating recipe object");
-    const recipe = new RecipeModel({
-      title,
-      isPublic,
-      ingredients,
-      instructions,
-      user: userId,
-      category,
-      cookingTime,
-      servingSize,
-      rating,
-      vegetarian,
-      comments,
-    });
-    await recipe.save();
-    console.log("recipe saved");
-    res.send({ recipe });
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-});
-
-router.post("/upload-image/:recipeId", authenticateJWT, async (req, res) => {
-  try {
-    console.log(req.params);
-    const recipeId = req.params.recipeId;
-    console.log(recipeId);
-    const recipe = await RecipeModel.findById(recipeId);
-    if (!recipe) {
-      return res.status(404).send({ error: "Recipe not found" });
-    }
-    // Use multer to handle the image file
-    const upload = multer({ storage: storage }).single("image");
-    upload(req, res, async (err) => {
-      if (err) {
-        return res.status(500).send({ error: err.message });
-      }
-      // Use cloudinary to upload the image
-      const result = await cloudinary.uploader.upload(req.file.path);
-      recipe.image = result.secure_url;
-      await recipe.save();
-      res.send({ recipe });
-    });
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-});
-
 // GETS ALL USERS RECIPES
 router.get("/all", authenticateJWT, async (req, res) => {
   try {
     //Find all recipes created by the current user
     const recipes = await RecipeModel.find({ user: req.user.userId });
-    // Send the recipes as the response
-    res.json({ recipes });
-  } catch (err) {
-    console.log("error", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GETS ALL RECIPES
-router.get("/public", async (req, res) => {
-  try {
-    //Find all recipes created by the current user
-    const recipes = await RecipeModel.find({ isPublic: true });
     // Send the recipes as the response
     res.json({ recipes });
   } catch (err) {
@@ -143,31 +60,109 @@ router.get("/search-ingredients", authenticateJWT, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-//Delet
-router.delete("/delete/:recipeId", authenticateJWT, async (req, res) => {
-  try {
-    // Check if the recipeId in the params is a valid ObjectId
-    const isValid = mongoose.Types.ObjectId.isValid(req.params.recipeId);
-    if (!isValid) {
-      return res.status(500).json({ error: "Invalid recipe id" });
-    }
 
-    // Find and delete the recipe that belongs to the current user and has the specified recipeId
-    const recipe = await RecipeModel.findOneAndDelete({
-      _id: req.params.recipeId,
+//SEARCH USERS RECIPES FOR title
+router.get("/search-title", authenticateJWT, async (req, res) => {
+  try {
+    // Get the ingredients from the query parameters
+    const title = JSON.parse(req.query.title);
+    // Find all recipes that contain the ingredients
+    const recipes = await RecipeModel.find({
+      title: { $in: title },
       user: req.user.userId,
     });
-
-    // If no recipe is found, return a 404 error
-    if (!recipe) {
-      return res.status(404).json({ error: "Recipe not found" });
-    }
-
-    // Send a success message as the response
-    res.json({ message: "Recipe successfully deleted" });
+    // Send the recipes as the response
+    res.json({ recipes });
   } catch (err) {
     console.log("error", err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Post new Recipe
+router.post("/add", authenticateJWT, async (req, res) => {
+  try {
+    const {
+      title,
+      isPublic,
+      ingredients,
+      instructions,
+      category,
+      cookingTime,
+      servingSize,
+      rating,
+      vegetarian,
+      comments,
+    } = req.body;
+
+    const { userId } = req.user;
+
+    console.log("route handler called");
+    console.log("finding user");
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).send({ error: "User not found" });
+    }
+
+    console.log("creating recipe object");
+
+    const recipe = new RecipeModel({
+      title,
+      isPublic,
+      ingredients,
+      instructions,
+      user: userId,
+      category,
+      cookingTime,
+      servingSize,
+      rating,
+      vegetarian,
+      comments,
+    });
+
+    await recipe.save();
+
+    console.log("recipe saved");
+
+    res.send({ recipe });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+// upload image to recipe
+router.post("/upload-image/:recipeId", authenticateJWT, async (req, res) => {
+  try {
+    console.log(req.params);
+
+    const recipeId = req.params.recipeId;
+
+    console.log(recipeId);
+
+    const recipe = await RecipeModel.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).send({ error: "Recipe not found" });
+    }
+    // Use multer to handle the image file
+    const upload = multer({ storage: storage }).single("image");
+    upload(req, res, async (err) => {
+      if (err) {
+        return res.status(500).send({ error: err.message });
+      }
+      // Use cloudinary to upload the image
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        height: 182,
+        radius: 30,
+        width: 300,
+        crop: "fill",
+      });
+      recipe.image = result.secure_url;
+      await recipe.save();
+      res.send({ recipe });
+    });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
   }
 });
 
@@ -207,22 +202,30 @@ router.patch("/update/:recipeId", authenticateJWT, async (req, res) => {
   }
 });
 
-router.get("/home", async (req, res) => {
+//Delete user recipe
+router.delete("/delete/:recipeId", authenticateJWT, async (req, res) => {
   try {
-    const randomRecipes = await RecipeModel.aggregate([
-      { $match: { isPublic: true } },
-      { $sample: { size: 4 } },
-    ]);
-    const newRecipes = randomRecipes.map((recipe) => {
-      recipe.image = cloudinary.url(recipe.image, {
-        width: 300,
-        height: 300,
-        crop: "fill",
-      });
-      return recipe;
+    // Check if the recipeId in the params is a valid ObjectId
+    const isValid = mongoose.Types.ObjectId.isValid(req.params.recipeId);
+    if (!isValid) {
+      return res.status(500).json({ error: "Invalid recipe id" });
+    }
+
+    // Find and delete the recipe that belongs to the current user and has the specified recipeId
+    const recipe = await RecipeModel.findOneAndDelete({
+      _id: req.params.recipeId,
+      user: req.user.userId,
     });
-    res.json(newRecipes);
+
+    // If no recipe is found, return a 404 error
+    if (!recipe) {
+      return res.status(404).json({ error: "Recipe not found" });
+    }
+
+    // Send a success message as the response
+    res.json({ message: "Recipe successfully deleted" });
   } catch (err) {
+    console.log("error", err);
     res.status(500).json({ error: err.message });
   }
 });

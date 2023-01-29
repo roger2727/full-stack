@@ -24,7 +24,7 @@ const Login = () => {
 
       if (data.token) {
         localStorage.setItem("token", data.token);
-        navigate("/AddRecipe");
+        navigate("/user");
       } else {
         console.error("Invalid email or password");
       }

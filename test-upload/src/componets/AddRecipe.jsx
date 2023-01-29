@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Nav from "./Nav";
+import "./AddRecipe.css";
 
 const AddRecipe = () => {
   const [formData, setFormData] = useState({
     title: "",
-    ingredients: "",
-    instructions: "",
+    ingredients: [],
+    instructions: [],
     category: "",
 
     cookingTime: "",
@@ -20,7 +22,15 @@ const AddRecipe = () => {
   const navigate = useNavigate();
 
   const onChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === "ingredients" || e.target.name === "instructions") {
+      const value = e.target.value;
+      setFormData({
+        ...formData,
+        [e.target.name]: value.split("\n"),
+      });
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
   };
 
   const onSubmit = async (e) => {
@@ -49,105 +59,105 @@ const AddRecipe = () => {
       console.error(err);
     }
   };
+
   return (
     <div>
-      <h1>Add Recipe</h1>
-      <form onSubmit={onSubmit}>
-        <div>
-          <label htmlFor="title">Title</label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={onChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="category">Category</label>
-          <select
-            name="category"
-            value={formData.category}
-            onChange={onChange}
-            required
-          >
-            <option value="Dinner">Dinner</option>
-            <option value="Breakfast">Breakfast</option>
-            <option value="Lunch">Lunch</option>
-            <option value="Dessert">Dessert</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="ingredients">Ingredients</label>
-          <input
-            type="text"
-            name="ingredients"
-            value={formData.ingredients}
-            onChange={onChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="instructions">Instructions</label>
-          <input
-            type="text"
-            name="instructions"
-            value={formData.instructions}
-            onChange={onChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="isPublic">Public</label>
-          <input
-            type="checkbox"
-            name="isPublic"
-            value={formData.isPublic}
-            onChange={onChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="cookingTime">Cooking Time</label>
-          <input
-            type="text"
-            name="cookingTime"
-            value={formData.cookingTime}
-            onChange={onChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="servingSize">Serving Size</label>
-          <input
-            type="text"
-            name="servingSize"
-            value={formData.servingSize}
-            onChange={onChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="rating">Rating</label>
-          <input
-            type="text"
-            name="rating"
-            value={formData.rating}
-            onChange={onChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="vegetarian">Vegetarian</label>
-          <input
-            type="text"
-            name="vegetarian"
-            value={formData.vegetarian}
-            onChange={onChange}
-            required
-          />
-        </div>
-        <input type="submit" value="Add Recipe" />
-      </form>
+      <Nav />
+      <div className="form-box">
+        <h1>Add Recipe</h1>
+        <form onSubmit={onSubmit}>
+          <div>
+            <label htmlFor="title">Title</label>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={onChange}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="category">Category</label>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={onChange}
+              required
+            >
+              <option value="">Select a category</option>
+              <option value="Dinner">Dinner</option>
+              <option value="Breakfast">Breakfast</option>
+              <option value="Lunch">Lunch</option>
+              <option value="Dessert">Dessert</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="ingredients">Ingredients</label>
+            <textarea
+              name="ingredients"
+              value={formData.ingredients.join("\n")}
+              onChange={onChange}
+              required
+              placeholder="Example: 
+salt
+chciken
+salad"
+            />
+          </div>
+          <div>
+            <label htmlFor="instructions">Instructions</label>
+            <textarea
+              name="instructions"
+              value={formData.instructions.join("\n")}
+              onChange={onChange}
+              required
+              placeholder="Example: 
+Preheat oven to 350°F.
+In a large bowl, combine flour, sugar, and baking powder.
+Add in the butter, eggs, and milk. Mix until well combined."
+            />
+          </div>
+          <div>
+            <label htmlFor="cookingTime">Cooking Time (minutes)</label>
+            <input
+              type="number"
+              name="cookingTime"
+              value={formData.cookingTime}
+              onChange={onChange}
+              min="10"
+              max="200"
+              step="10"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="servingSize">Serving Size</label>
+            <input
+              type="number"
+              name="servingSize"
+              value={formData.servingSize}
+              onChange={onChange}
+              required
+              min="1"
+              max="10"
+            />
+          </div>
+          <div>
+            <label htmlFor="rating">Rating (out of 5)</label>
+            <input
+              type="number"
+              name="rating"
+              min="0"
+              max="5"
+              value={formData.rating}
+              onChange={onChange}
+              required
+            />
+          </div>
+
+          <button type="submit">Add Recipe</button>
+        </form>
+      </div>
     </div>
   );
 };

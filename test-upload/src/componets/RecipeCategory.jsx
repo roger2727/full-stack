@@ -9,7 +9,7 @@ const RecipeCategory = () => {
   const { category } = useParams();
 
   useEffect(() => {
-    fetch(`http://localhost:4001/recipes/category/${category}`)
+    fetch(`http://localhost:4001/public/category/${category}`)
       .then((res) => res.json())
       .then((data) => setRecipes(data))
       .catch((err) => console.log(err));
@@ -22,7 +22,7 @@ const RecipeCategory = () => {
       <h2>Recipes for {category}</h2>
       <div className="image-container">
         {recipes.map((recipe) => (
-          <Link key={recipe._id} to={`/public/recipes/${recipe._id}`}>
+          <Link key={recipe._id} to={`/${recipe._id}`}>
             <img src={recipe.image} alt={recipe.title} />
           </Link>
         ))}

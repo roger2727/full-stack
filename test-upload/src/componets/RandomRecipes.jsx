@@ -7,7 +7,7 @@ const RandomRecipes = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch("http://localhost:4001/recipes/home");
+      const res = await fetch("http://localhost:4001/public/home");
       const data = await res.json();
       setRecipes(data);
     }
@@ -19,9 +19,11 @@ const RandomRecipes = () => {
       <h2>Top Picks</h2>
       <div className="random-recipes">
         {recipes.map((recipe) => (
-          <div key={recipe._id}>
+          <div className="random-group" key={recipe._id}>
             {recipe.image && (
-              <Link to={`/public/recipes/${recipe._id}`}>
+              <Link to={`/${recipe._id}`}>
+                <p className="title">{recipe.title}</p>
+
                 <img
                   className="recipe-image"
                   src={recipe.image}

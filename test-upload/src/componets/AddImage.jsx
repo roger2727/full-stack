@@ -18,7 +18,7 @@ const AddImage = () => {
       const formData = new FormData();
       formData.append("image", selectedImage);
       const response = await fetch(
-        `http://localhost:4001/recipe/upload-image/${recipeId}`,
+        `http://localhost:4001/recipes/upload-image/${recipeId}?width=300`,
         {
           method: "POST",
           body: formData,
@@ -28,7 +28,7 @@ const AddImage = () => {
         }
       );
       if (response.ok) {
-        navigate("/all");
+        navigate(`/${recipeId}`);
       } else {
         const error = await response.json();
         console.error(error);

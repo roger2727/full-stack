@@ -7,7 +7,7 @@ const RecipeCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    fetch("http://localhost:4001/recipes/get-all")
+    fetch("http://localhost:4001/public/all")
       .then((res) => res.json())
       .then((data) => setRecipes(data.recipes))
       .catch((err) => console.log(err));
@@ -31,7 +31,7 @@ const RecipeCarousel = () => {
 
   return (
     <div>
-      <h2>public recipes</h2>
+      <h2>All recipes</h2>
       <div className="carousel-container ">
         <div className="carousel">
           <button className="carousel-btn" onClick={handlePrevClick}>
@@ -40,7 +40,8 @@ const RecipeCarousel = () => {
           {recipes
             .slice(currentIndex, currentIndex + 4)
             .map((recipe, index) => (
-              <Link key={recipe._id} to={`/public/recipes/${recipe._id}`}>
+              <Link key={recipe._id} to={`/${recipe._id}`}>
+                <p className="title">{recipe.title}</p>
                 <img
                   className="carousel-image"
                   src={recipe.image}

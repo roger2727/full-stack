@@ -1,16 +1,60 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SearchRecipes.css";
+
 const SearchRecipes = () => {
   const navigate = useNavigate();
   const [showCategoryButtons, setShowCategoryButtons] = useState(false);
+  const [showIngredientButtons, setShowIngredientButtons] = useState(false);
+  const [showRecipeNameSearch, setShowRecipeNameSearch] = useState(false);
+  const [showServingSize, setShowServingSize] = useState(false);
+  const [searchIngredient, setSearchIngredient] = useState("");
+  const [searchRecipeName, setSearchRecipeName] = useState("");
+  const [servingSize, setServingSize] = useState(0);
 
   const handleCategoryClick = () => {
     setShowCategoryButtons(!showCategoryButtons);
+    setShowIngredientButtons(false);
+    setShowRecipeNameSearch(false);
+    setShowServingSize(false);
+  };
+
+  const handleIngredientClick = () => {
+    setShowIngredientButtons(!showIngredientButtons);
+    setShowCategoryButtons(false);
+    setShowRecipeNameSearch(false);
+    setShowServingSize(false);
+  };
+
+  const handleRecipeNameClick = () => {
+    setShowRecipeNameSearch(!showRecipeNameSearch);
+    setShowCategoryButtons(false);
+    setShowIngredientButtons(false);
+    setShowServingSize(false);
+  };
+
+  const handleServingSizeClick = () => {
+    setShowServingSize(!showServingSize);
+    setShowCategoryButtons(false);
+    setShowIngredientButtons(false);
+    setShowRecipeNameSearch(false);
   };
 
   const handleCategorySearch = (category) => {
     navigate(`/category/${category}`);
+  };
+
+  const handleIngredientSearch = () => {
+    navigate(`/search-ingredients/${searchIngredient}`);
+  };
+
+  const handleRecipeNameSearch = () => {
+    navigate(`/search-title/${searchRecipeName}`);
+  };
+
+  const handleServingSizeSearch = (servingSize) => {
+    setServingSize(servingSize);
+    navigate(`/search-serving-size/${servingSize}`);
   };
 
   return (
@@ -20,52 +64,76 @@ const SearchRecipes = () => {
         <button className="search-btns" onClick={handleCategoryClick}>
           Category
         </button>
-        <button
-          className="search-btns"
-          onClick={() => handleClick("ingredients")}
-        >
+        <button className="search-btns" onClick={handleIngredientClick}>
           Ingredients
         </button>
-        <button className="search-btns" onClick={() => handleClick("ratings")}>
-          Ratings
+        <button className="search-btns" onClick={handleRecipeNameClick}>
+          Recipe Name
         </button>
-        <button
-          className="search-btns"
-          onClick={() => handleClick("vegetarian")}
-        >
+        <button className="search-btns" onClick={handleServingSizeClick}>
           Serving size
         </button>
       </div>
       {showCategoryButtons && (
-        <div className="category-btns">
+        <div className="cat-btns">
           <button
-            className="cat-btn"
-            onClick={() => handleCategorySearch("Dinner")}
-          >
-            Dinner
-          </button>
-          <button
-            className="cat-btn"
+            className="category-btns"
             onClick={() => handleCategorySearch("Breakfast")}
           >
             Breakfast
           </button>
           <button
-            className="cat-btn"
-            onClick={() => handleCategorySearch("Dessert")}
-          >
-            Dessert
-          </button>
-          <button
-            className="cat-btn"
+            className="category-btns"
             onClick={() => handleCategorySearch("Lunch")}
           >
             Lunch
           </button>
+          <button
+            className="category-btns"
+            onClick={() => handleCategorySearch("Dinner")}
+          >
+            Dinner
+          </button>
+          <button
+            className="category-btns"
+            onClick={() => handleCategorySearch("Dessert")}
+          >
+            Dessert
+          </button>
+        </div>
+      )}
+      {showIngredientButtons && (
+        <div className="ingredient-search">
+          <input
+            type="text"
+            placeholder="Search by Ingredient"
+            value={searchIngredient}
+            onChange={(e) => setSearchIngredient(e.target.value)}
+          />
+          <button onClick={handleIngredientSearch}>Search</button>
+        </div>
+      )}
+      {showRecipeNameSearch && (
+        <div className="recipe-name-search">
+          <input
+            type="text"
+            placeholder="Search by Recipe Name"
+            value={searchRecipeName}
+            onChange={(e) => setSearchRecipeName(e.target.value)}
+          />
+          <button onClick={handleRecipeNameSearch}>Search</button>
+        </div>
+      )}
+      {showServingSize && (
+        <div className="serving-size-btns">
+          <button onClick={() => handleServingSizeSearch(1)}>1</button>
+          <button onClick={() => handleServingSizeSearch(2)}>2</button>
+          <button onClick={() => handleServingSizeSearch(4)}>4</button>
+          <button onClick={() => handleServingSizeSearch(6)}>6</button>
+          <button onClick={() => handleServingSizeSearch(8)}>8</button>
         </div>
       )}
     </div>
   );
 };
-
 export default SearchRecipes;
