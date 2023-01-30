@@ -108,4 +108,6 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Define the "/auth/user" endpoint
+
 export default router;

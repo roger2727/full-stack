@@ -84,14 +84,14 @@ router.post("/add", authenticateJWT, async (req, res) => {
   try {
     const {
       title,
-      isPublic,
+
       ingredients,
       instructions,
       category,
       cookingTime,
       servingSize,
       rating,
-      vegetarian,
+
       comments,
     } = req.body;
 
@@ -109,7 +109,7 @@ router.post("/add", authenticateJWT, async (req, res) => {
 
     const recipe = new RecipeModel({
       title,
-      isPublic,
+
       ingredients,
       instructions,
       user: userId,
@@ -117,7 +117,7 @@ router.post("/add", authenticateJWT, async (req, res) => {
       cookingTime,
       servingSize,
       rating,
-      vegetarian,
+
       comments,
     });
 
